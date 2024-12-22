@@ -6,9 +6,9 @@
   "mixins": [
   ],
   "client": [
+    "KeyMappingAccessor",
     "MinecraftMixin",
-    "MouseHandleAccessor",
-    "KeyMappingAccessor"
+    "MouseHandleAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

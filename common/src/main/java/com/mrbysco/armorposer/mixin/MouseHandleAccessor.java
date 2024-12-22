@@ -6,6 +6,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(MouseHandler.class)
 public interface MouseHandleAccessor {
-    @Accessor
-    void setMouseGrabbed(boolean value);
+    @Accessor("mouseGrabbed")
+    void armorposer$setMouseGrabbed(boolean value);
 }

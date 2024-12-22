@@ -1,7 +1,7 @@
 package com.mrbysco.armorposer.platform;
 
-import com.mrbysco.armorposer.ArmorPoser;
 import com.mrbysco.armorposer.Reference;
+import com.mrbysco.armorposer.client.ClientHandler;
 import com.mrbysco.armorposer.config.PoserConfig;
 import com.mrbysco.armorposer.data.SwapData;
 import com.mrbysco.armorposer.data.SyncData;
@@ -9,10 +9,13 @@ import com.mrbysco.armorposer.packets.ArmorStandSwapPayload;
 import com.mrbysco.armorposer.packets.ArmorStandSyncPayload;
 import com.mrbysco.armorposer.platform.services.IPlatformHelper;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.nio.file.Path;
@@ -60,7 +63,17 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
 	@Override
 	public KeyMapping registerKeyMapping(KeyMapping mapping) {
-		ArmorPoser.KEY_MAPPINGS.add(mapping);
+		ClientHandler.KEY_MAPPINGS.add(mapping);
 		return mapping;
+	}
+
+	@Override
+	public void onMoveableScreen(boolean close) {
+		Options options = Minecraft.getInstance().options;
+		options.keyUp.setKeyConflictContext(close ? KeyConflictContext.IN_GAME : KeyConflictContext.UNIVERSAL);
+		options.keyDown.setKeyConflictContext(close ? KeyConflictContext.IN_GAME : KeyConflictContext.UNIVERSAL);
+		options.keyLeft.setKeyConflictContext(close ? KeyConflictContext.IN_GAME : KeyConflictContext.UNIVERSAL);
+		options.keyRight.setKeyConflictContext(close ? KeyConflictContext.IN_GAME : KeyConflictContext.UNIVERSAL);
+		options.keyJump.setKeyConflictContext(close ? KeyConflictContext.IN_GAME : KeyConflictContext.UNIVERSAL);
 	}
 }

@@ -67,4 +67,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
 	public KeyMapping registerKeyMapping(KeyMapping mapping) {
 		return KeyBindingHelper.registerKeyBinding(mapping);
 	}
+
+	@Override
+	public void onMoveableScreen(boolean close) {
+		//Not needed for Fabric
+	}
 }

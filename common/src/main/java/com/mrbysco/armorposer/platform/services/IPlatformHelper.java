@@ -53,4 +53,9 @@ public interface IPlatformHelper {
 	 * @return bound KeyMapping
 	 */
 	KeyMapping registerKeyMapping(KeyMapping mapping);
+
+	/**
+	 * Executed when a moveable screen is opened or closed
+	 */
+	void onMoveableScreen(boolean close);
 }

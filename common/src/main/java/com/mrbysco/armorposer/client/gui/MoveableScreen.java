@@ -1,6 +1,7 @@
 package com.mrbysco.armorposer.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mrbysco.armorposer.client.KeybindHandler;
 import com.mrbysco.armorposer.mixin.KeyMappingAccessor;
 import com.mrbysco.armorposer.mixin.MouseHandleAccessor;
 import com.mrbysco.armorposer.platform.Services;
@@ -11,8 +12,6 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public abstract class MoveableScreen extends Screen {
-    private static final KeyMapping DEFER_CONTROL_KEY = Services.PLATFORM.registerKeyMapping(new KeyMapping("armorposer.keybind.deferControl", GLFW.GLFW_KEY_LEFT_ALT, "armorposer.keybinds"));
-
     private double mouseX;
     private double mouseY;
     private boolean isPressDown = false;
@@ -20,6 +19,7 @@ public abstract class MoveableScreen extends Screen {
     private boolean wasDeferred = false;
     protected MoveableScreen(Component title) {
         super(title);
+        Services.PLATFORM.onMoveableScreen(false);
     }
 
     @Override
@@ -32,6 +32,12 @@ public abstract class MoveableScreen extends Screen {
     public void removed() {
         this.tickRelease();
         super.removed();
+    }
+
+    @Override
+    public void onClose() {
+        Services.PLATFORM.onMoveableScreen(true);
+        super.onClose();
     }
 
     @Override
@@ -54,7 +60,8 @@ public abstract class MoveableScreen extends Screen {
             return true;
 
         this.updateKeybind();
-        if (DEFER_CONTROL_KEY.isDown()) {
+        if (KeybindHandler.DEFER_CONTROL_KEY.isDown()) {
+            //Center the mouse so it doesn't cause button tooltips to show
             //Else consume it ourselves
             if (!this.wasDeferred) {
                 var mouseHandle = this.minecraft.mouseHandler;
@@ -62,7 +69,7 @@ public abstract class MoveableScreen extends Screen {
                 this.mouseX = mouseHandle.xpos();
                 this.mouseY = mouseHandle.ypos();
                 mouseHandle.setIgnoreFirstMove();
-                ((MouseHandleAccessor)mouseHandle).setMouseGrabbed(true);
+                ((MouseHandleAccessor)mouseHandle).armorposer$setMouseGrabbed(true);
                 InputConstants.grabOrReleaseMouse(this.minecraft.getWindow().getWindow(), 212995, ((double) this.minecraft.getWindow().getScreenWidth() / 2), ((double) this.minecraft.getWindow().getScreenHeight() / 2));
             }
 
@@ -73,6 +80,7 @@ public abstract class MoveableScreen extends Screen {
             } else {
                 KeyMapping.set(keyEntry, false);
             }
+
             return true;
         }
         return false;
@@ -82,8 +90,7 @@ public abstract class MoveableScreen extends Screen {
         if (this.wasDeferred) {
             this.wasDeferred = false;
             this.minecraft.mouseHandler.setIgnoreFirstMove();
-            ((MouseHandleAccessor)this.minecraft.mouseHandler).setMouseGrabbed(false);
-            InputConstants.grabOrReleaseMouse(this.minecraft.getWindow().getWindow(), 212993, this.mouseX, this.mouseY);
+            ((MouseHandleAccessor)this.minecraft.mouseHandler).armorposer$setMouseGrabbed(false);
             InputConstants.grabOrReleaseMouse(this.minecraft.getWindow().getWindow(), 212993, this.mouseX, this.mouseY);
         }
     }
@@ -106,18 +113,16 @@ public abstract class MoveableScreen extends Screen {
     @Override
     public boolean keyReleased(int key, int scanCode, int modifiers) {
         this.updateKeybind();
-        if (!DEFER_CONTROL_KEY.isDown()) {
+        if (!KeybindHandler.DEFER_CONTROL_KEY.isDown()) {
             this.tickRelease();
         }
         return super.keyReleased(key, scanCode, modifiers);
     }
 
     private void updateKeybind() {
-        var key = ((KeyMappingAccessor)DEFER_CONTROL_KEY).getKey();
+        var key = ((KeyMappingAccessor)KeybindHandler.DEFER_CONTROL_KEY).armorposer$getKey();
         if (key.getType() == InputConstants.Type.KEYSYM && key.getValue() != InputConstants.UNKNOWN.getValue()) {
-            DEFER_CONTROL_KEY.setDown(InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key.getValue()));
+            KeybindHandler.DEFER_CONTROL_KEY.setDown(InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key.getValue()));
         }
     }
-
-    public static void earlyInit() {}
 }

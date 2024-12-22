@@ -1,5 +1,6 @@
 package com.mrbysco.armorposer;
 
+import com.mrbysco.armorposer.client.KeybindHandler;
 import com.mrbysco.armorposer.client.gui.MoveableScreen;
 import com.mrbysco.armorposer.packets.ArmorStandScreenPayload;
 import net.fabricmc.api.ClientModInitializer;
@@ -10,7 +11,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 
 public class ArmorPoserClient implements ClientModInitializer {
 	static {
-		MoveableScreen.earlyInit();
+		KeybindHandler.loadClass();
 	}
 
 	@Override
